@@ -6,9 +6,10 @@
 //   * press SPACE to save
 
 // set up filename of target image
-String filename = "test";
+String filename = "alex.0";
 String fileext = ".jpg";
-String foldername = "./";
+String foldername = "./source/";
+final static String outputFolder = "./output/";
 
 // set up source image set
 // using below variables filenames from the set are constructed
@@ -26,11 +27,12 @@ String foldername = "./";
 //final static int pattern_size = 1; // number of digits
 
 // another example
-final static String pattern_prefix = "nyt/NYTimes-Dec1900-Jan1901_";
+// final static String pattern_prefix = "nyt/NYTimes-Dec1900-Jan1901_";
+final static String pattern_prefix = "sluggo/nancy.sluggo.";
 final static String file_ext = ".jpg";
-final static int pattern_init = 3; // starting number
-final static int pattern_length = 8; // how many images from the set
-final static int pattern_size = 4; // number of digits
+final static int pattern_init = 0; // starting number
+final static int pattern_length = 1; // how many images from the set
+final static int pattern_size = 1; // number of digits
 
 // choose method of mapping
 int mode = ABS_MODE;  // list below AVG_MODE, ABS_MODE, DIST_MODE
@@ -51,6 +53,8 @@ int max_display_size = 1000; // viewing window size (regardless image size)
 boolean do_blend = false; // blend image after process
 int blend_mode = OVERLAY; // blend type
 
+
+final static boolean AUTO_SAVE = true;
 // working buffer
 PGraphics buffer;
 
@@ -113,15 +117,21 @@ void processImage() {
   buffer.beginDraw();
 
   println("Preparing data");
+
+  println("  ... image");
   prepare_image();
+  
+  println("  ... patterns");
   prepare_patterns();
+
+  println("  ... segment");
   segment(0, img.width-1, 0, img.height-1, 2);
 
   println("Layering");
   for (String key : parts.keySet ()) {
     ArrayList<Part> p = parts.get(key);
     PImage _img = loadImage(key);
-    println("Parts from image: " + key);
+    // println("Parts from image: " + key);
     for (Part part : p) {
       buffer.image(_img.get(part.posx, part.posy, part.w, part.h), part.x, part.y);
     }
@@ -135,14 +145,21 @@ void processImage() {
 
   buffer.endDraw();
   image(buffer,0,0,width,height);
+
+  if (AUTO_SAVE) {
+    savit();
+  }
+}
+
+void savit() {
+  String fn = outputFolder + filename + "/res_" + sessionid + hex((int)random(0xffff),4)+"_"+filename+fileext;
+  buffer.save(fn);
+  println("Image "+ fn + " saved");
 }
 
 void keyPressed() {
-  // SPACE to save
   if(keyCode == 32) {
-    String fn = foldername + filename + "/res_" + sessionid + hex((int)random(0xffff),4)+"_"+filename+fileext;
-    buffer.save(fn);
-    println("Image "+ fn + " saved");
+    savit();
   }
 }
 
@@ -166,7 +183,7 @@ void prepare_patterns() {
     String suf = nf(i, pattern_size);
     String fname = pattern_prefix + suf + file_ext;
     PImage _img = loadImage(fname);
-    println(fname);
+    println("fname", fname);
     LImage bi = new LImage();
     bi.b = new PVector[_img.width][_img.height];
     bi.name = fname;
@@ -202,7 +219,9 @@ void find_match(int posx, int posy, int w, int h) {
   LImage currimg = null;
 
   for (int i=0; i<number_of_iterations; i++) {
-    LImage _img = imgsb.get( (int)random(imgsb.size()) );
+
+    int imgIndex = (int)random(imgsb.size()-1);
+    LImage _img = imgsb.get( imgIndex );
     for (int iter=0; iter<number_of_blocks; iter++) {
       int xx = (int)random(_img.w-w-1);
       int yy = (int)random(_img.h-h-1);
@@ -241,6 +260,11 @@ void find_match(int posx, int posy, int w, int h) {
   p.y = posy;
 
   ArrayList<Part> list;
+  
+  // println("parts", parts);
+  println("currimg", currimg);
+  println("name", currimg.name);
+
   if (parts.containsKey(currimg.name)) {
     list = parts.get(currimg.name);
   } else {
@@ -263,6 +287,7 @@ void segment(int x1, int x2, int y1, int y2, int obl) {
     segment(x1, x1+midx, y1+midy+1, y2, obl-1);
     segment(x1+midx+1, x2, y1+midy+1, y2, obl-1);
   } else {
+    println("  ... find_match");
     find_match(x1, y1, diffx+1, diffy+1);
   }
 }
