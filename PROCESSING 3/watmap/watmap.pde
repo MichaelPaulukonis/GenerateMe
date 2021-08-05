@@ -6,7 +6,7 @@
 //   * press SPACE to save
 
 // set up filename of target image
-String filename = "alex.0";
+String filename = "alex.1";
 String fileext = ".jpg";
 String foldername = "./source/";
 final static String outputFolder = "./output/";
@@ -30,15 +30,19 @@ final static String outputFolder = "./output/";
 // final static String pattern_prefix = "nyt/NYTimes-Dec1900-Jan1901_";
 final static String pattern_prefix = "sluggo/nancy.sluggo.";
 final static String file_ext = ".jpg";
-final static int pattern_init = 0; // starting number
+final static int pattern_init = 10; // starting number
 final static int pattern_length = 1; // how many images from the set
 final static int pattern_size = 1; // number of digits
 
 // choose method of mapping
-int mode = ABS_MODE;  // list below AVG_MODE, ABS_MODE, DIST_MODE
+// int mode = ABS_MODE;  // list below AVG_MODE, ABS_MODE, DIST_MODE
+int mode = AVG_MODE;
 
-int THR = 20; // higher value bigger rectangles (1..200)
-int MINR = 8; // minimum block (4..200)
+// int THR = 20; // higher value bigger rectangles (1..200)
+// int MINR = 8; // minimum block (4..200)
+
+int THR = 40; // higher value bigger rectangles (1..200)
+int MINR = 40; // minimum block (4..200)
 
 int number_of_iterations = 20; // more = more variety
 int number_of_blocks = 50; // more = more search tries
@@ -148,6 +152,7 @@ void processImage() {
 
   if (AUTO_SAVE) {
     savit();
+    exit();
   }
 }
 
