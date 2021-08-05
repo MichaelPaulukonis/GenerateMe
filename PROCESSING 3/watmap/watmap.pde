@@ -6,7 +6,7 @@
 //   * press SPACE to save
 
 // set up filename of target image
-String filename = "alex.1";
+String filename = "alex.1.1";
 String fileext = ".jpg";
 String foldername = "./source/";
 final static String outputFolder = "./output/";
@@ -34,17 +34,13 @@ final static int pattern_init = 10; // starting number
 final static int pattern_length = 1; // how many images from the set
 final static int pattern_size = 1; // number of digits
 
-// choose method of mapping
-// int mode = ABS_MODE;  // list below AVG_MODE, ABS_MODE, DIST_MODE
-int mode = AVG_MODE;
-
 // int THR = 20; // higher value bigger rectangles (1..200)
 // int MINR = 8; // minimum block (4..200)
 
-int THR = 40; // higher value bigger rectangles (1..200)
-int MINR = 40; // minimum block (4..200)
+int THR = 50; // higher value bigger rectangles (1..200)
+int MINR = 4; // minimum block (4..200)
 
-int number_of_iterations = 20; // more = more variety
+int number_of_iterations = 50; // more = more variety
 int number_of_blocks = 50; // more = more search tries
 
 // MODEs LIST
@@ -52,9 +48,13 @@ final static int AVG_MODE = 0; // worst matching, difference of avgs of the luma
 final static int ABS_MODE = 1; // difference of the luma each pixel
 final static int DIST_MODE = 2; // best matching, distance between pixels colors (vectors)
 
+// choose method of mapping
+// int mode = ABS_MODE;  // list below AVG_MODE, ABS_MODE, DIST_MODE
+int mode = ABS_MODE;
+
 int max_display_size = 1000; // viewing window size (regardless image size)
 
-boolean do_blend = false; // blend image after process
+boolean do_blend = true; // blend image after process
 int blend_mode = OVERLAY; // blend type
 
 
@@ -68,6 +68,16 @@ PImage img;
 String sessionid;
 
 void setup() {
+
+  if (args != null) {
+    println(args.length);
+    for (int i = 0; i < args.length; i++) {
+      println(args[i]);
+    }
+  } else {
+    println("args == null");
+  }
+
   sessionid = hex((int)random(0xffff),4);
   img = loadImage(foldername+filename+fileext);
 
