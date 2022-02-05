@@ -6,9 +6,9 @@
 //   * press SPACE to save
 
 // set up filename of target image
-String filename = "alex.1.1";
+String filename = "bl1002";
 String fileext = ".jpg";
-String foldername = "./source/";
+String foldername = "./bl/";
 final static String outputFolder = "./output/";
 
 // set up source image set
@@ -27,17 +27,22 @@ final static String outputFolder = "./output/";
 //final static int pattern_size = 1; // number of digits
 
 // another example
-// final static String pattern_prefix = "nyt/NYTimes-Dec1900-Jan1901_";
-final static String pattern_prefix = "sluggo/nancy.sluggo.";
+// final static String pattern_prefix = "nyt/NYTimes-Dec1900-Jan1901_00";
+final static String pattern_prefix = "bl/bl1000_";
+// final static String pattern_prefix = "sluggo/nancy.sluggo.";
 final static String file_ext = ".jpg";
-final static int pattern_init = 10; // starting number
+final static int pattern_init = 0; // starting number
 final static int pattern_length = 1; // how many images from the set
 final static int pattern_size = 1; // number of digits
 
 // int THR = 20; // higher value bigger rectangles (1..200)
 // int MINR = 8; // minimum block (4..200)
 
-int THR = 50; // higher value bigger rectangles (1..200)
+// 10 is very details, 50 is not so much
+// for nyt/NYTimes-Dec1900-Jan1901_00
+// vs bl1000
+
+int THR = 20; // higher value bigger rectangles (1..200)
 int MINR = 4; // minimum block (4..200)
 
 int number_of_iterations = 50; // more = more variety
@@ -50,11 +55,11 @@ final static int DIST_MODE = 2; // best matching, distance between pixels colors
 
 // choose method of mapping
 // int mode = ABS_MODE;  // list below AVG_MODE, ABS_MODE, DIST_MODE
-int mode = ABS_MODE;
+int mode = DIST_MODE;
 
 int max_display_size = 1000; // viewing window size (regardless image size)
 
-boolean do_blend = true; // blend image after process
+boolean do_blend = false; // blend image after process
 int blend_mode = OVERLAY; // blend type
 
 
@@ -133,10 +138,10 @@ void processImage() {
   println("Preparing data");
 
   println("  ... image");
-  prepare_image();
+  imgb = prepare_image();
   
   println("  ... patterns");
-  prepare_patterns();
+  imgsb = prepare_patterns();
 
   println("  ... segment");
   segment(0, img.width-1, 0, img.height-1, 2);
@@ -167,20 +172,20 @@ void processImage() {
 }
 
 void savit() {
-  String fn = outputFolder + filename + "/res_" + sessionid + hex((int)random(0xffff),4)+"_"+filename+fileext;
-  buffer.save(fn);
-  println("Image "+ fn + " saved");
+  String fullname = outputFolder + filename + "/res_" + filename + "_" + sessionid + hex((int)random(0xffff),4) + fileext;
+  buffer.save(fullname);
+  println("Image " + fullname + " saved");
 }
 
 void keyPressed() {
-  if(keyCode == 32) {
+  if (keyCode == 32) {
     savit();
   }
 }
 
 PVector[][] imgb;
-void prepare_image() {
-  imgb = new PVector[img.width][img.height];
+PVector[][] prepare_image() {
+  PVector[][] imgb = new PVector[img.width][img.height];
   for (int x=0; x<img.width; x++) {
     for (int y=0; y<img.height; y++) {
       int c = img.get(x, y);
@@ -191,10 +196,12 @@ void prepare_image() {
       imgb[x][y] = v;
     }
   }
+  return imgb;
 }
 
-void prepare_patterns() {
-  for (int i=pattern_init; i< (pattern_init+pattern_length); i++) {
+ArrayList<LImage> prepare_patterns() {
+  ArrayList<LImage> imgs = new ArrayList<LImage>();
+  for (int i = pattern_init; i< (pattern_init + pattern_length); i++) {
     String suf = nf(i, pattern_size);
     String fname = pattern_prefix + suf + file_ext;
     PImage _img = loadImage(fname);
@@ -214,8 +221,9 @@ void prepare_patterns() {
         bi.b[x][y] = v;
       }
     }
-    imgsb.add(bi);
+    imgs.add(bi);
   }
+  return imgs;
 }
 
 void find_match(int posx, int posy, int w, int h) {
@@ -233,7 +241,7 @@ void find_match(int posx, int posy, int w, int h) {
   int curryy = -1;
   LImage currimg = null;
 
-  for (int i=0; i<number_of_iterations; i++) {
+  for (int i = 0; i < number_of_iterations; i++) {
 
     int imgIndex = (int)random(imgsb.size()-1);
     LImage _img = imgsb.get( imgIndex );

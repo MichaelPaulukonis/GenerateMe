@@ -33,6 +33,20 @@ turning `number_of_iterations` to `1` produces crap
 but as low as 5, with small block size produces recognizeable results
 (in a solo image - what would happen if repeated and animated?)
 
+
+The below (30,8,5,5) is eminently recognizeable on a NYT vs bl1000
+but NOT vs bl1002 - which is "solid" w/ color variations
+bl1000 is "empty" with things in it
+
+```
+int THR = 30; // higher value bigger rectangles (1..200)
+int MINR = 8; // minimum block (4..200)
+
+int number_of_iterations = 5; // more = more variety
+int number_of_blocks = 5; // more = more search tries
+```
+
+
 ```
 final static int AVG_MODE = 0; // worst matching, difference of avgs of the luma
 final static int ABS_MODE = 1; // difference of the luma each pixel
